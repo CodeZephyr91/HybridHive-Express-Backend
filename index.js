@@ -10,11 +10,13 @@ const app=express()
 app.use(cors({origin:process.env.frontenduri, credentials: true}))
 app.use(cookieParser())
 app.use(express.json())
-const port=5000
-const oauth2client=new google.auth.OAuth2(
-    process.env.google_client_id,
-    process.env.google_client_secret,
-    process.env.google_redirect_uri
+const port=process.env.PORT || 5000
+const oauth2client = new google.auth.OAuth2(
+  process.env.google_client_id,
+  process.env.google_client_secret,
+  process.env.NODE_ENV === "production"
+      ? process.env.google_redirect_uri_production
+      : process.env.google_redirect_uri_local
 )
 app.get("/auth/google",(req,res)=>{
     const authurl=oauth2client.generateAuthUrl(
@@ -37,7 +39,7 @@ app.get("/auth/callback", async(req,res)=>{
         const { code }=req.query
         const { tokens }=await oauth2client.getToken(code)
         res.cookie("googleAuth",JSON.stringify(tokens),{ httpOnly: true})
-        res.redirect("http://localhost:5173/schedule")
+        res.redirect("https://hybrid-hive-webapp-frontend.vercel.app/schedule")
     }
     catch(error){
         console.error("Oauth callback failed")
