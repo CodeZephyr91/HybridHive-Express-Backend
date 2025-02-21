@@ -14,9 +14,7 @@ const port=process.env.PORT || 5000
 const oauth2client = new google.auth.OAuth2(
   process.env.google_client_id,
   process.env.google_client_secret,
-  process.env.NODE_ENV === "production"
-      ? process.env.google_redirect_uri_production
-      : process.env.google_redirect_uri_local
+  process.env.google_redirect_uri_production
 )
 app.get("/auth/google",(req,res)=>{
     const authurl=oauth2client.generateAuthUrl(
